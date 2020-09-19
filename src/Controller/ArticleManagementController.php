@@ -23,6 +23,14 @@ class ArticleManagementController extends AbstractController
     }
 
     /**
+     * @Route("/admin", name="menu")
+     */
+    public function menu()
+    {
+        return $this->render('home.html.twig');
+    }
+
+    /**
      * @Route("/article/add", name="add_article")
      * @param Request $request
      * @param EntityManagerInterface $entityManager
@@ -232,33 +240,33 @@ class ArticleManagementController extends AbstractController
     {
         $content = $request->request->all();
         if($content){
-            $repoWarehouse = $this->getDoctrine()->getRepository(Warehouse::class);
-            $warehouse = $repoWarehouse->findOneBy([ 'name' => $content['warehouse'] ]);
-            $repoArticle = $this->getDoctrine()->getRepository(Article::class);
-            $article = $repoArticle->findOneBy([ 'reference' => $content['reference'] ]);
-            $repoStock = $this->getDoctrine()->getRepository(Stock::class);
-            $stock = $repoStock->findOneBy( [
-                'article' => $article,
-                'warehouse' => $warehouse
-            ]);
             if (!empty($content['reference']) && !empty($content['warehouse']) && !empty($content['amount'])){
                 if (preg_match('/[0-9,]/', $content['amount'])){
                     if (preg_match("/[a-zA-Z'\-\b]/", $content['warehouse'])){
-                        if ($warehouse){
-                            if (!$stock){
-                                $stock = new Stock;
-                                $stock->setArticle($article)
-                                    ->setWarehouse($warehouse)
-                                    ->setAmount($content['amount']);
-                                $entityManager->persist($stock);
-                                $entityManager->flush();
-                                return $this->json([ "message" => "Le stockage de l'article à bien été fait ! "], 200);
-                            }else {
-                                return $this->json([ "message" => "Cet article est déjà dans l'entrepôt concerné !"], 200);
+                            $repoWarehouse = $this->getDoctrine()->getRepository(Warehouse::class);
+                            $warehouse = $repoWarehouse->findOneBy([ 'name' => $content['warehouse'] ]);
+                            if ($warehouse){
+                                $repoArticle = $this->getDoctrine()->getRepository(Article::class);
+                                $article = $repoArticle->findOneBy([ 'reference' => $content['reference'] ]);
+                                $repoStock = $this->getDoctrine()->getRepository(Stock::class);
+                                $stock = $repoStock->findOneBy( [
+                                    'article' => $article,
+                                    'warehouse' => $warehouse
+                                ]);
+                                if (!$stock){
+                                    $stock = new Stock;
+                                    $stock->setArticle($article)
+                                        ->setWarehouse($warehouse)
+                                        ->setAmount($content['amount']);
+                                    $entityManager->persist($stock);
+                                    $entityManager->flush();
+                                    return $this->json([ "message" => "Le stockage de l'article à bien été fait ! "], 200);
+                                }else {
+                                    return $this->json([ "message" => "Cet article est déjà dans l'entrepôt concerné !"], 200);
+                                }
+                            } else {
+                                return $this->json([ "message" => "Cet entrepôt n'existe pas !"], 200);
                             }
-                        } else {
-                            return $this->json([ "message" => "Cet entrepôt n'existe pas !"], 200);
-                        }
                     } else {
                         return $this->json([ "message" => "Le nom d'entrepôt entré n'est pas valide !"], 200);
                     }

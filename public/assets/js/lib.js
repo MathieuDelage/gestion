@@ -166,7 +166,7 @@ $('#add_article_stock_submit').click(function(e){
         {
             type : 'post',
             data : {
-                'reference' : $('#edit_article_reference').val(),
+                'reference' : $('#get_article_by_ref_reference').val(),
                 'warehouse' : $('#add_article_stock_warehouse').val(),
                 'amount' : $('#add_article_stock_amount').val()
             },
