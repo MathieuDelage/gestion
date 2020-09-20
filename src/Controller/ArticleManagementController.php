@@ -279,4 +279,31 @@ class ArticleManagementController extends AbstractController
         }
         return $this->json([ "message" => "Requête vide !"], 204);
     }
+
+    /**
+     * @Route("/article/delete_article", name="delete_article")
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
+    public function delete(Request $request, EntityManagerInterface $entityManager)
+    {
+        $content = $request->request->all();
+        if($content){
+            if (preg_match('/[0-9]/', $content['reference']) ){
+                $repoArticle = $this->getDoctrine()->getRepository(Article::class);
+                $article = $repoArticle->findOneBy([ 'reference' => $content['reference']]);
+                if($article){
+                    $entityManager->remove($article);
+                    $entityManager->flush();
+                    return $this->json([ "message" => "Article supprimé ! "], 200);
+                }else {
+                    return $this->json([ "message" => "Cet article n'existe pas ! "], 200);
+                }
+            }else {
+                return $this->json([ "message" => "Le champs 'Référence de l'article' ne contient pas un entier ! "], 200);
+            }
+        }
+        return $this->render('article/delete_article.html.twig');
+    }
 }

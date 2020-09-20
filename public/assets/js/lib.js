@@ -179,3 +179,28 @@ $('#add_article_stock_submit').click(function(e){
         }
     )
 });
+
+$('#delete_article_by_ref_submit').click(function(e){
+    e.preventDefault();
+    $.ajax(
+        "/article/delete_article",
+        {
+            type : 'delete',
+            data : {
+                'reference' : $('#delete_article_by_ref_reference').val()
+            },
+            dataType: 'json',
+            success : function(data) {
+                $('#delete_article_by_ref_result').empty();
+                if(data['message']){
+                    $('#delete_article_by_ref_result').append(data['message']);
+                } else {
+                    $('#delete_article_by_ref_submit').html("Nouvelle Suppression");
+                }
+            },
+            error : function (data){
+                $('#delete_article_by_ref_result').empty().append("e.code + ' ' + e.message");
+            }
+        }
+    )
+});
