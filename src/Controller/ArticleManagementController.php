@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class ArticleManagementController extends AbstractController
 {
@@ -77,8 +79,11 @@ class ArticleManagementController extends AbstractController
 
     /**
      * @Route("/article/get_article", name="get_article")
+     * @param ObjectNormalizer $normalizer
+     * @return Response
+     * @throws ExceptionInterface
      */
-    public function getArticle()
+    public function getArticle(ObjectNormalizer $normalizer)
     {
         $repo = $this->getDoctrine()->getRepository(Article::class);
         $articles = $repo->findAll();
@@ -220,17 +225,6 @@ class ArticleManagementController extends AbstractController
     }
 
     /**
-     * @Route("/article/get_warehouse", name="get_warehouse")
-     * @return JsonResponse
-     */
-    public function getWarehouse()
-    {
-        $repo = $this->getDoctrine()->getRepository(Warehouse::class);
-        $warehouses = $repo->findAll();
-        return $this->json($warehouses, 200);
-    }
-
-    /**
      * @Route("/article/add_article_stock", name="add_article_article")
      * @param Request $request
      * @param EntityManagerInterface $entityManager
@@ -240,35 +234,26 @@ class ArticleManagementController extends AbstractController
     {
         $content = $request->request->all();
         if($content){
-            if (!empty($content['reference']) && !empty($content['warehouse']) && !empty($content['amount'])){
+            if (!empty($content['reference']) && !empty($content['amount'])){
                 if (preg_match('/[0-9,]/', $content['amount'])){
-                    if (preg_match("/[a-zA-Z'\-\b]/", $content['warehouse'])){
-                            $repoWarehouse = $this->getDoctrine()->getRepository(Warehouse::class);
-                            $warehouse = $repoWarehouse->findOneBy([ 'name' => $content['warehouse'] ]);
-                            if ($warehouse){
-                                $repoArticle = $this->getDoctrine()->getRepository(Article::class);
-                                $article = $repoArticle->findOneBy([ 'reference' => $content['reference'] ]);
-                                $repoStock = $this->getDoctrine()->getRepository(Stock::class);
-                                $stock = $repoStock->findOneBy( [
-                                    'article' => $article,
-                                    'warehouse' => $warehouse
-                                ]);
-                                if (!$stock){
-                                    $stock = new Stock;
-                                    $stock->setArticle($article)
-                                        ->setWarehouse($warehouse)
-                                        ->setAmount($content['amount']);
-                                    $entityManager->persist($stock);
-                                    $entityManager->flush();
-                                    return $this->json([ "message" => "Le stockage de l'article à bien été fait ! "], 200);
-                                }else {
-                                    return $this->json([ "message" => "Cet article est déjà dans l'entrepôt concerné !"], 200);
-                                }
-                            } else {
-                                return $this->json([ "message" => "Cet entrepôt n'existe pas !"], 200);
-                            }
-                    } else {
-                        return $this->json([ "message" => "Le nom d'entrepôt entré n'est pas valide !"], 200);
+                    $repoArticle = $this->getDoctrine()->getRepository(Article::class);
+                    $article = $repoArticle->findOneBy([ 'reference' => $content['reference'] ]);
+                    $repoStock = $this->getDoctrine()->getRepository(Stock::class);
+                    $stock = $repoStock->findOneBy( [
+                        'article' => $article,
+                    ]);
+                    if (!$stock){
+                        $repoWarehouse = $this->getDoctrine()->getRepository(Warehouse::class);
+                        $warehouse = $repoWarehouse->findOneBy([ 'name' => 'Neveu' ]);
+                        $stock = new Stock;
+                        $stock->setArticle($article)
+                            ->setWarehouse($warehouse)
+                            ->setAmount($content['amount']);
+                        $entityManager->persist($stock);
+                        $entityManager->flush();
+                        return $this->json([ "message" => "Le stockage de l'article à bien été fait ! "], 200);
+                    }else {
+                        return $this->json([ "message" => "Cet article est déjà dans l'entrepôt concerné !"], 200);
                     }
                 }else {
                     return $this->json([ "message" => "La quantité entrée n'est pas un entier !"], 200);

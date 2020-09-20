@@ -139,24 +139,7 @@ $('#get_article_price_submit').click(function(e){
 
 $('#add_stock_submit').click(function(e){
     e.preventDefault();
-    $.ajax(
-        "/article/get_warehouse",
-        {
-            type : 'get',
-            dataType: 'json',
-            success : function(data) {
-                $('#stock').show();
-                $('#warehouse_list').show();
-                for (let i = 0; i < data.length; i++){
-                    $('#warehouse_tbody').append(
-                        "<tr>" +
-                        "<th scope='col'>" + data[i]['name'] + "</th>" +
-                        "</tr>"
-                    );
-                }
-            }
-        }
-    )
+    $('#stock').show();
 });
 
 $('#add_article_stock_submit').click(function(e){
@@ -167,7 +150,6 @@ $('#add_article_stock_submit').click(function(e){
             type : 'post',
             data : {
                 'reference' : $('#get_article_by_ref_reference').val(),
-                'warehouse' : $('#add_article_stock_warehouse').val(),
                 'amount' : $('#add_article_stock_amount').val()
             },
             success : function(data) {

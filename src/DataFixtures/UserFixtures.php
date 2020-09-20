@@ -10,9 +10,9 @@ class UserFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        $password = password_hash("admin", PASSWORD_BCRYPT);
+        $password = password_hash("administrateur", PASSWORD_BCRYPT);
         $user = new User();
-        $user->setLogin('admin')
+        $user->setUsername('administrateur')
             ->setPassword($password);
         $manager->persist($user);
         $manager->flush();
