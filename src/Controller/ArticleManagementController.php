@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class ArticleManagementController extends AbstractController
 {
@@ -79,11 +78,9 @@ class ArticleManagementController extends AbstractController
 
     /**
      * @Route("/article/get_article", name="get_article")
-     * @param ObjectNormalizer $normalizer
      * @return Response
-     * @throws ExceptionInterface
      */
-    public function getArticle(ObjectNormalizer $normalizer)
+    public function getArticle()
     {
         $repo = $this->getDoctrine()->getRepository(Article::class);
         $articles = $repo->findAll();
