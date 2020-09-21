@@ -11,9 +11,6 @@ $('#add_article_submit').click(function(e){
             },
             success : function(data) {
                 $('#add_article_result').empty().append(data['message']);
-            },
-            error : function (e){
-                $('#add_article_result').append("e.code + ' ' + e.message");
             }
         }
     )
@@ -43,10 +40,7 @@ $('#get_article_by_ref_submit').click(function(e){
                         $('#edit_article_price').val(data['price']);
                         $('#edit_article_result').empty();
                     }
-                },
-            error : function (data){
-                $('#get_article_by_ref_result').empty().append("e.code + ' ' + e.message");
-            }
+                }
         }
     )
 });
@@ -64,9 +58,6 @@ $('#edit_article_submit').click(function(e){
             },
             success : function(data) {
                 $('#edit_article_result').empty().append(data['message']);
-            },
-            error : function (){
-                $('#edit_article_result').append("Erreur dans l'édition de l'article");
             }
         }
     )
@@ -129,9 +120,6 @@ $('#get_article_price_submit').click(function(e){
                         );
                     }
                 }
-            },
-            error : function (data){
-                $('#get_article_by_ref_result').empty().append("e.code + ' ' + e.message");
             }
         }
     )
@@ -154,9 +142,6 @@ $('#add_article_stock_submit').click(function(e){
             },
             success : function(data) {
                 $('#add_article_stock_result').empty().append(data['message']);
-            },
-            error : function (e){
-                $('#add_article_stock_result').append("e.code + ' ' + e.message")
             }
         }
     )
@@ -179,9 +164,6 @@ $('#delete_article_by_ref_submit').click(function(e){
                 } else {
                     $('#delete_article_by_ref_submit').html("Nouvelle Suppression");
                 }
-            },
-            error : function (data){
-                $('#delete_article_by_ref_result').empty().append("e.code + ' ' + e.message");
             }
         }
     )
